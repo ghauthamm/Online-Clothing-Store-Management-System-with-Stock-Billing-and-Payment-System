@@ -55,7 +55,7 @@ const LoginPage = () => {
                     setError('Too many failed attempts. Please try again later.');
                     break;
                 default:
-                    setError('Login failed. Please try again.');
+                    setError(`Login failed: ${err.message}`);
             }
         } finally {
             setLoading(false);
@@ -78,7 +78,7 @@ const LoginPage = () => {
             } else if (err.code === 'auth/popup-blocked') {
                 setError('Popup blocked. Please allow popups for this site.');
             } else {
-                setError('Google sign in failed. Please try again.');
+                setError(`Google sign in failed: ${err.message}`);
             }
         } finally {
             setLoading(false);
@@ -107,7 +107,7 @@ const LoginPage = () => {
             } else if (err.code === 'auth/too-many-requests') {
                 setError('Too many requests. Please try again later.');
             } else {
-                setError('Failed to send OTP. Please try again.');
+                setError(`Failed to send OTP: ${err.message}`);
             }
         } finally {
             setLoading(false);
@@ -135,7 +135,7 @@ const LoginPage = () => {
             if (err.code === 'auth/invalid-verification-code') {
                 setError('Invalid OTP. Please try again.');
             } else {
-                setError('Verification failed. Please try again.');
+                setError(`Verification failed: ${err.message}`);
             }
         } finally {
             setLoading(false);

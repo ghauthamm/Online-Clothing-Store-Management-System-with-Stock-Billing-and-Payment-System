@@ -81,7 +81,7 @@ const RegisterPage = () => {
                     setError('Password is too weak');
                     break;
                 default:
-                    setError('Registration failed. Please try again.');
+                    setError(`Registration failed: ${err.message}`);
             }
         } finally {
             setLoading(false);
@@ -104,7 +104,7 @@ const RegisterPage = () => {
             } else if (err.code === 'auth/popup-blocked') {
                 setError('Popup blocked. Please allow popups for this site.');
             } else {
-                setError('Google sign up failed. Please try again.');
+                setError(`Google sign up failed: ${err.message}`);
             }
         } finally {
             setLoading(false);
@@ -138,7 +138,7 @@ const RegisterPage = () => {
             } else if (err.code === 'auth/too-many-requests') {
                 setError('Too many requests. Please try again later.');
             } else {
-                setError('Failed to send OTP. Please try again.');
+                setError(`Failed to send OTP: ${err.message}`);
             }
         } finally {
             setLoading(false);
@@ -166,7 +166,7 @@ const RegisterPage = () => {
             if (err.code === 'auth/invalid-verification-code') {
                 setError('Invalid OTP. Please try again.');
             } else {
-                setError('Verification failed. Please try again.');
+                setError(`Verification failed: ${err.message}`);
             }
         } finally {
             setLoading(false);
