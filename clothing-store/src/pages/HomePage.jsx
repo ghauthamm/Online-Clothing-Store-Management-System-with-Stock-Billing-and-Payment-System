@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiArrowRight } from 'react-icons/fi';
-import ProductCard from '../../components/products/ProductCard';
-import { getFeaturedProducts } from '../../services/productService';
-import { useShop } from '../../context/ShopContext';
+import ProductCard from '../components/products/ProductCard';
+import { getFeaturedProducts } from '../services/productService';
+import { useShop } from '../context/ShopContext';
 
 const HomePage = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);

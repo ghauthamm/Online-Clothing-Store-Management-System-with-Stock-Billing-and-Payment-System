@@ -29,6 +29,9 @@ import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 
+// Setup Page
+import SetupPage from './pages/SetupPage';
+
 // User Pages
 import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
@@ -62,6 +65,9 @@ function App() {
                 {/* Auth Routes - No Navbar/Footer */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+
+                {/* Setup Route - For initial database seeding */}
+                <Route path="/setup" element={<SetupPage />} />
 
                 {/* Admin Routes - Custom Layout */}
                 <Route

@@ -5,7 +5,11 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    updateProfile
+    updateProfile,
+    GoogleAuthProvider,
+    signInWithPopup,
+    RecaptchaVerifier,
+    signInWithPhoneNumber
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -16,13 +20,17 @@ export const useAuth = () => {
     return useContext(AuthContext);
 };
 
+// Google Provider
+const googleProvider = new GoogleAuthProvider();
+
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [confirmationResult, setConfirmationResult] = useState(null);
 
-    // Register new user
+    // Register new user with email/password
     const register = async (email, password, name, phone) => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -36,19 +44,101 @@ export const AuthProvider = ({ children }) => {
             phone,
             role: 'user',
             address: [],
+            authProvider: 'email',
             createdAt: new Date().toISOString()
         });
 
         return userCredential;
     };
 
-    // Login user
+    // Login user with email/password
     const login = (email, password) => {
         return signInWithEmailAndPassword(auth, email, password);
     };
 
+    // Sign in with Google
+    const signInWithGoogle = async () => {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        // Check if user exists in Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+        if (!userDoc.exists()) {
+            // Create new user document
+            await setDoc(doc(db, 'users', user.uid), {
+                name: user.displayName,
+                email: user.email,
+                phone: user.phoneNumber || '',
+                photoURL: user.photoURL,
+                role: 'user',
+                address: [],
+                authProvider: 'google',
+                createdAt: new Date().toISOString()
+            });
+        }
+
+        return result;
+    };
+
+    // Setup reCAPTCHA for phone auth
+    const setupRecaptcha = (containerId) => {
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
+                'size': 'invisible',
+                'callback': () => {
+                    // reCAPTCHA solved
+                }
+            });
+        }
+        return window.recaptchaVerifier;
+    };
+
+    // Send OTP to phone number
+    const sendOTP = async (phoneNumber, containerId) => {
+        const recaptchaVerifier = setupRecaptcha(containerId);
+        const formattedPhone = phoneNumber.startsWith('+') ? phoneNumber : `+91${phoneNumber}`;
+
+        const confirmation = await signInWithPhoneNumber(auth, formattedPhone, recaptchaVerifier);
+        setConfirmationResult(confirmation);
+        return confirmation;
+    };
+
+    // Verify OTP
+    const verifyOTP = async (otp, userName) => {
+        if (!confirmationResult) {
+            throw new Error('Please request OTP first');
+        }
+
+        const result = await confirmationResult.confirm(otp);
+        const user = result.user;
+
+        // Check if user exists in Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+        if (!userDoc.exists()) {
+            // Create new user document
+            await setDoc(doc(db, 'users', user.uid), {
+                name: userName || 'User',
+                email: '',
+                phone: user.phoneNumber,
+                role: 'user',
+                address: [],
+                authProvider: 'phone',
+                createdAt: new Date().toISOString()
+            });
+        }
+
+        return result;
+    };
+
     // Logout user
-    const logout = () => {
+    const logout = async () => {
+        // Clear recaptcha
+        if (window.recaptchaVerifier) {
+            window.recaptchaVerifier.clear();
+            window.recaptchaVerifier = null;
+        }
         return signOut(auth);
     };
 
@@ -91,8 +181,12 @@ export const AuthProvider = ({ children }) => {
         userRole,
         userData,
         loading,
+        confirmationResult,
         register,
         login,
+        signInWithGoogle,
+        sendOTP,
+        verifyOTP,
         logout,
         getUserData,
         updateUserProfile

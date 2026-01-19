@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form, InputGroup, Button, Badge } from 'react-bootstrap';
 import { FiSearch, FiFilter, FiX } from 'react-icons/fi';
-import ProductCard from '../../components/products/ProductCard';
-import { getAllProducts, getProductsByCategory, searchProducts } from '../../services/productService';
+import ProductCard from '../components/products/ProductCard';
+import { getAllProducts, getProductsByCategory, searchProducts } from '../services/productService';
 
 const ProductsPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();

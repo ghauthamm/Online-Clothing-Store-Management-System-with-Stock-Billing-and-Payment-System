@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, Card, Modal } from 'react-bootstrap';
 import { FiMapPin, FiPlus, FiCreditCard, FiTruck, FiCheck } from 'react-icons/fi';
-import { useCart } from '../../context/CartContext';
-import { useAuth } from '../../context/AuthContext';
-import { createOrder } from '../../services/orderService';
-import { addUserAddress, getUserById } from '../../services/userService';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { createOrder } from '../services/orderService';
+import { addUserAddress, getUserById } from '../services/userService';
 import { toast } from 'react-toastify';
 
 const CheckoutPage = () => {
